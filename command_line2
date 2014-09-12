@@ -1,0 +1,4 @@
+perl Rdxplorer2.pl -PairCollect In=/home/kye/SSC06293.RG2.bam Out=/home/kye/data/wholegenome/SSC06293/SSC06293.rdxp
+
+perl Rdxplorer2.pl -PairValid In=/home/kye/SSC06293.RG2.bam Out=/home/kye/data/wholegenome/SSC06293/SSC06293.rdxp MQValid=20
+

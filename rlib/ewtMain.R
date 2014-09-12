@@ -1,0 +1,206 @@
+
+runEwtMain<-function(apphome, outputfile, countwinfile, chr, hg, win, gender='F', baseCopy=2, filter=0, dirsep = "/"){
+
+source(paste (apphome, dirsep, "rlib/ewtCountFunctionVer3.R", sep=''))
+source(paste (apphome, dirsep, "rlib/event2copyVer4.R", sep=''))
+source(paste (apphome, dirsep, "rlib/getLong.R", sep=''))
+source(paste (apphome, dirsep, "rlib/event2tristate.R", sep=''))
+source(paste (apphome, dirsep, "rlib/getSummaryVer2.R", sep=''))
+source(paste (apphome, dirsep, "rlib/getGapProbes.R", sep=''))
+source(paste (apphome, dirsep, "rlib/getGcc.R", sep=''))
+source(paste (apphome, dirsep, "rlib/plotit.R", sep=''))
+
+lower <- 1.5; upper <- 2.5; sig <- 0.000001
+
+#count <- scan(paste(wrkgdir, dirsep, countwinfile, sep=""))
+count_temp<-read.csv(countwinfile,sep=' ',header=F);
+count_temp[is.na(count_temp[,2]),2]=0;
+count <- count_temp[,2];
+cat(paste("-12", '\n'))
+
+  if(sum(as.numeric(count))>0)
+  {
+    gc <- round(scan(paste(apphome, dirsep, "rlib" , dirsep, "gc", win, '_', hg, dirsep,chr,"gc", win, ".txt",sep="")))
+
+#    cat(paste("-11", '\n'))
+    #print (countwinfile)
+    #print (paste(apphome, dirsep, "rlib" , dirsep, "gc", win, '_', hg, dirsep,chr,"gc", win, ".txt",sep=""));
+    gcDF <- data.frame(count,gc)
+    
+#    cat(paste("-10", '\n'))
+
+    gapProbes <- getGapProbes(apphome, chr, hg, win)
+#    cat(paste("-9", '\n'))
+    gcDFnogap <- gcDF[-gapProbes,]
+#    cat(paste("-8", '\n'))
+    gcc <- getGcc(count,gc,gapProbes)
+#    cat(paste("-7", '\n'))
+    gccNoGap <- gcc[-gapProbes]
+#    cat(paste("-6", '\n'))
+    ftd <- gccNoGap[which(gccNoGap<2*median(gccNoGap))]
+#    cat(paste("-5", '\n'))
+    gcDFftd <- gcDFnogap[which(gccNoGap<2*median(gccNoGap)),]
+#    cat(paste("-4", '\n'))
+
+    nzd <- baseCopy*gcc/mean(ftd)
+#    cat(paste("-3", '\n'))
+    write.table(round(gcc, 4) ,paste(outputfile,".gcc",sep=""),row.names=F,col.names=F)
+    write.table(round(nzd, 4) ,paste(outputfile,".nzd",sep=""),row.names=F,col.names=F)
+#    cat(paste("-2", '\n'))
+    out <- ewt(apphome, gcc,gapProbes,degreeInput=0.75)
+#    cat(paste("-1", '\n'))
+    if(length(out)>0){
+#      cat(paste("1", '\n'))
+      ewtOut <- out[,1:3]
+#      cat(paste("2", '\n'))
+	tristate <- event2tristate(ewtOut,length(nzd))
+#	cat(paste("3", '\n'))
+	copy2nzd <- nzd[which(tristate==0)]
+#	cat(paste("4", '\n'))
+	copyZstat <- event2copy(apphome, ewtOut[which(ewtOut[,3]!=0),],nzd,mean(copy2nzd),var(copy2nzd),baseCopy=baseCopy)
+#	cat(paste("5", '\n'))
+	copyZstat[gapProbes,1] <- 2
+#	cat(paste("6", '\n'))
+	ch_digit<-gsub("^chr", "", chr)
+#	cat(paste("7", '\n'))
+	summary <- getSummary(apphome, nzd,nzd[which(tristate==0)],copyZstat[,1],ch_digit, baseCopy=2)
+#	cat(paste("8", '\n'))
+	summary <- summary[which(summary$seg.median<=lower | summary$seg.median>=upper),]
+#	cat(paste("9", '\n'))
+	summary <- summary[which(1-pnorm(abs(summary$zstat))<sig),]
+#	cat(paste("10", '\n'))
+	colnames(summary)<-c("segStart", "segEnd", "state", "length", "copyEst", "segMedian", "zstat", "chrom", "posStart",  "posEnd")
+#	cat(paste("11", '\n'))
+	write.table(summary,paste(outputfile,".sum",sep=""), quote = FALSE, sep = "\t", eol = "\n", na = "0", dec = ".", row.names = FALSE, col.names = TRUE, qmethod = c("escape", "double"))
+      	## if filtered
+	if (filter>0){
+	  sum.filt <- summary[which(summary$length >= filter),]
+	  write.table(sum.filt, paste(outputfile,".sum.filt",sep=""), quote = FALSE, sep = "\t", eol = "\n", na = "0", dec = ".", row.names = FALSE, col.names = TRUE, qmethod = c("escape", "double"))
+	}
+
+	write.table(ewtOut,paste(outputfile,".ewt",sep=""), quote = FALSE, sep = "\t", eol = "\n", na = "0", dec = ".", row.names = FALSE, col.names = FALSE, qmethod = c("escape", "double"))
+#	cat(paste("12", '\n'))
+	#plotit(wrkgdir, countwinfile, chr, filter, dirsep)
+	## No need to load everything second time
+	#plotit(wrkgdir, nzd, summary, chr, filter, dirsep)
+#	cat(paste("13", '\n'))
+
+    }
+  }
+
+}
+
+
+### We may delete this if one of the top works
+
+runEwtMain_bkp<-function(apphome, wrkgdir, countwinfile, chr, hg, win, gender='F', baseCopy=2, filter=0, dirsep = "/"){
+
+source(paste (apphome, dirsep, "rlib/ewtCountFunctionVer3.R", sep=''))
+source(paste (apphome, dirsep, "rlib/event2copyVer4.R", sep=''))
+source(paste (apphome, dirsep, "rlib/getLong.R", sep=''))
+source(paste (apphome, dirsep, "rlib/event2tristate.R", sep=''))
+source(paste (apphome, dirsep, "rlib/getSummaryVer2.R", sep=''))
+source(paste (apphome, dirsep, "rlib/getGapProbes.R", sep=''))
+source(paste (apphome, dirsep, "rlib/getGcc.R", sep=''))
+source(paste (apphome, dirsep, "rlib/plotit.R", sep=''))
+
+lower <- 1.5; upper <- 2.5; sig <- 0.000001
+
+count <- scan(paste(wrkgdir, dirsep, countwinfile, sep=""))
+
+  if(sum(as.numeric(count))>0){
+    gc <- round(scan(paste(apphome, dirsep, "rlib" , dirsep, "gc", win, '_', hg, dirsep,chr,"gc", win, ".txt",sep="")))
+    gcDF <- data.frame(count,gc)
+
+
+    gapProbes <- getGapProbes(apphome, chr, hg, win)
+    gcDFnogap <- gcDF[-gapProbes,]
+
+    gcc <- getGcc(count,gc,gapProbes)
+
+    gccNoGap <- gcc[-gapProbes]
+
+    ftd <- gccNoGap[which(gccNoGap<2*median(gccNoGap))]
+    gcDFftd <- gcDFnogap[which(gccNoGap<2*median(gccNoGap)),]
+
+
+    nzd <- baseCopy*gcc/mean(ftd)
+
+    write.table(round(gcc, 4) ,paste(wrkgdir, dirsep, chr,".gcc",sep=""),row.names=F,col.names=F)
+    write.table(round(nzd, 4) ,paste(wrkgdir, dirsep, chr,".nzd",sep=""),row.names=F,col.names=F)
+    out <- ewt(apphome, gcc,gapProbes,degreeInput=0.75)
+    if(length(out)>0){
+      ewtOut <- out[,1:3]
+	tristate <- event2tristate(ewtOut,length(nzd))
+	copy2nzd <- nzd[which(tristate==0)]
+	copyZstat <- event2copy(apphome, ewtOut[which(ewtOut[,3]!=0),],nzd,mean(copy2nzd),var(copy2nzd),baseCopy=baseCopy)
+	copyZstat[gapProbes,1] <- 2
+	ch_digit<-gsub("^chr", "", chr)
+	summary <- getSummary(apphome, nzd,nzd[which(tristate==0)],copyZstat[,1],ch_digit, baseCopy=2)
+	summary <- summary[which(summary$seg.median<=lower | summary$seg.median>=upper),]
+	summary <- summary[which(1-pnorm(abs(summary$zstat))<sig),]
+	colnames(summary)<-c("segStart", "segEnd", "state", "length", "copyEst", "segMedian", "zstat", "chrom", "posStart",  "posEnd")
+	write.table(summary,paste(wrkgdir, dirsep, chr,".sum",sep=""), quote = FALSE, sep = "\t", eol = "\n", na = "0", dec = ".", row.names = FALSE, col.names = TRUE, qmethod = c("escape", "double"))
+      	## if filtered
+	if (filter>0){
+	  sum.filt <- summary[which(summary$length >= filter),]
+	  write.table(sum.filt, paste(wrkgdir, dirsep, chr,".sum.filt",sep=""), quote = FALSE, sep = "\t", eol = "\n", na = "0", dec = ".", row.names = FALSE, col.names = TRUE, qmethod = c("escape", "double"))
+	}
+
+	write.table(ewtOut,paste(wrkgdir, dirsep, chr,".ewt",sep=""), quote = FALSE, sep = "\t", eol = "\n", na = "0", dec = ".", row.names = FALSE, col.names = FALSE, qmethod = c("escape", "double"))
+
+	#plotit(wrkgdir, countwinfile, chr, filter, dirsep)
+	## No need to load everything second time
+	plotit(wrkgdir, nzd, summary, chr, filter, dirsep)
+
+    }
+  }
+
+}
+
+###################################################################################################################
+###################################################################################################################
+###################################################################################################################
+###################################################################################################################
+###################################################################################################################
+
+
+runEwtMainNzd<-function(apphome, wrkgdir, countwinfile, chr, hg, win, gender='F', baseCopy=2, filter=0, dirsep = "/"){
+
+
+source(paste (apphome, dirsep, "rlib/ewtCountFunctionVer3.R", sep=''))
+source(paste (apphome, dirsep, "rlib/event2copyVer4.R", sep=''))
+source(paste (apphome, dirsep, "rlib/getLong.R", sep=''))
+source(paste (apphome, dirsep, "rlib/event2tristate.R", sep=''))
+source(paste (apphome, dirsep, "rlib/getSummaryVer2.R", sep=''))
+source(paste (apphome, dirsep, "rlib/getGapProbes.R", sep=''))
+source(paste (apphome, dirsep, "rlib/getGcc.R", sep=''))
+source(paste (apphome, dirsep, "rlib/plotit.R", sep=''))
+
+
+lower <- 1.5; upper <- 2.5; sig <- 0.000001
+
+count <- scan(paste(wrkgdir, dirsep, countwinfile, sep=""))
+
+  if(sum(as.numeric(count))>0){
+    gc <- round(scan(paste(apphome, dirsep, "rlib" , dirsep, "gc", win, '_', hg, dirsep,chr,"gc", win, ".txt",sep="")))
+    gcDF <- data.frame(count,gc)
+
+
+    gapProbes <- getGapProbes(apphome, chr, hg, win)
+    gcDFnogap <- gcDF[-gapProbes,]
+
+    gcc <- getGcc(count,gc,gapProbes)
+
+    gccNoGap <- gcc[-gapProbes]
+
+    ftd <- gccNoGap[which(gccNoGap<2*median(gccNoGap))]
+    gcDFftd <- gcDFnogap[which(gccNoGap<2*median(gccNoGap)),]
+
+
+    nzd <- baseCopy*gcc/mean(ftd)
+
+    write.table(round(nzd, 4) ,paste(wrkgdir, dirsep, chr,".nzd",sep=""),row.names=F,col.names=F)
+
+    }
+  }

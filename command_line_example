@@ -1,0 +1,15 @@
+Rdxplorer 2 is made up of the following steps:
+
+Step 1. Original Rdxplorer
+perl Rdxplorer2.pl -Depth In=/fisher/pcsham/WO216/LP6005162-DNA_B01/Assembly/genome/bam/LP6005162-DNA_B01.bam Out=/home/zengshuai/Pairend_validator/Data/LP6005162-DNA_B01.rdxp
+
+Step 2. Get the paired end infos
+perl Rdxplorer2.pl -PairCollect In=/fisher/pcsham/WO216/LP6005162-DNA_B01/Assembly/genome/bam/LP6005162-DNA_B01.bam Out=/home/zengshuai/Pairend_validator/Data/LP6005162-DNA_B01.rdxp
+
+Step 3. Integrate the paired ends into RD
+perl Rdxplorer2.pl -PairValid In=/fisher/pcsham/WO216/LP6005162-DNA_B01/Assembly/genome/bam/LP6005162-DNA_B01.bam Out=/home/zengshuai/Pairend_validator/Data/LP6005162-DNA_B01.rdxp
+
+############################
+
+Instead of running Rdxplorer2 step by step, user can run the whole pipeline using a simple command:
+perl Rdxplorer2.pl -All In=/fisher/pcsham/WO216/LP6005162-DNA_B01/Assembly/genome/bam/LP6005162-DNA_B01.bam Out=/home/zengshuai/Pairend_validator/Data/LP6005162-DNA_B01.rdxp

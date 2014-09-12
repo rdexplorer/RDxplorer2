@@ -1,0 +1,4 @@
+perl Rdxplorer2.pl -All In=/data/safe/kye/wholegenome/SSC06295/SSC06295.RG2.bam Out=/home/kye/data/wholegenome/SSC06295/SSC06295.rdxp MQValid=20
+
+perl Rdxplorer2.pl -All In=/data/safe/kye/wholegenome/SSC06298/SSC06298.RG2.bam Out=/home/kye/data/wholegenome/SSC06298/SSC06298.rdxp MQValid=20
+
