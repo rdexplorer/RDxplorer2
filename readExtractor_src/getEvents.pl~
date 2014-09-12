@@ -1,0 +1,96 @@
+#!/usr/bin/perl
+#creates two event files for the dels and dups in current dir
+#input is a directory containing the .sum files from part1
+#event files have:
+#	event number
+#	chr
+#	start
+#	stop
+#
+#usage:
+#	./getEvents.pl/mnt/wigclust17/data/unsafe/kpradhan/projects/kenny/rdexplorer/A01/cassava_eventInput/ 
+
+
+use strict;
+use warnings;
+
+#command line arguments
+my $summaryFolder = $ARGV[0];
+print "summary folder:  $summaryFolder\n";
+
+
+#which summary file goes with which chromosome?
+my %chrSumFileHash;
+for my $sumFile (glob "$summaryFolder/*.sum"){
+	#get the chromosome from summary
+	$sumFile =~ /\.(chr.*)\.rdx_raw/;
+	my $chr = $1;
+	#print STDERR "$chr\t$sumFile\n";
+	$chrSumFileHash{$chr} = $sumFile;
+}
+
+#the list of chromosomes
+my @chrs = map {"chr" . $_} (1..22,"X","Y");
+#for my $chr (@chrs){
+#	print "$chr\n";
+#}
+
+
+my @events;  #the list of events
+#process the summary files in chromsome order
+for my $chr (@chrs){
+	#which which summary file goes with current chromosome
+	my $sumFile = $chrSumFileHash{$chr};
+	#print STDERR "<$chr>\t<$sumFile>\n";
+
+	open my $sfh, "<", $sumFile; 
+
+	#skip the first line in the summary file
+	<$sfh>;
+
+	#process summary file line by line
+	while(my $line = <$sfh>){
+		chomp($line);
+		my ($t1, $t2, $state, $t4, $copynum, $t6, $t7, $chrom, $start, $stop, $rest) = split ' ', $line;
+		#print "$t1 $t2 $state $t4 $copynum $t6 $t7 $chrom $start $stop $rest\n";
+		#ignore the lines with copy_num >= 10
+		if ($copynum < 10){
+		
+			#retain  the columns for state, chr, start, stop
+			#add a "chr" to the chr field
+			#print "$state\tchr$chrom\t$start\t$stop\n";
+			push @events, "$state\tchr$chrom\t$start\t$stop\t$line";
+		}
+
+	}
+
+	close $sfh;
+}
+
+
+
+#now that the events are filtered
+#write them to two separate files for dels and dups
+open my $delfh, ">", "delEvents.txt";
+open my $dupfh, ">", "dupEvents.txt";
+
+my $enum = 1;
+for my $event (@events){
+	my ($state, $rest) = split ' ', $event, 2;
+	#state 1 are deletions
+	if ($state eq "1"){
+		print $delfh "$enum\t$rest\n";
+	}
+	#state 1 are duplications
+	if ($state eq "3"){
+		print $dupfh "$enum\t$rest\n";
+	}
+	$enum++;
+}
+
+
+close $delfh;
+close $dupfh;
+
+
+
