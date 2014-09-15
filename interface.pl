@@ -10,20 +10,21 @@ sub interface
         for ($no_arg=0;$no_arg<10;$no_arg++)
         {
 
-                if ($ARGV[$no_arg]=~/In=/){@f=split /\=/, $ARGV[$no_arg];$input=$f[1]}
-                if ($ARGV[$no_arg]=~/Out=/){@f=split /\=/, $ARGV[$no_arg];$output=$f[1]}
-                if ($ARGV[$no_arg]=~/MQValid=/){@f=split /\=/, $ARGV[$no_arg];$MQValid=$f[1]}
-                
+			if ($ARGV[$no_arg]=~/In=/){@f=split /\=/, $ARGV[$no_arg];$input=$f[1];}
+			if ($ARGV[$no_arg]=~/Out=/){@f=split /\=/, $ARGV[$no_arg];$output=$f[1];}
+			if ($ARGV[$no_arg]=~/MQValid=/){@f=split /\=/, $ARGV[$no_arg];$MQValid=$f[1];}
+			if ($ARGV[$no_arg]=~/qualThresh=/){@f=split /\=/, $ARGV[$no_arg];$qualThresh=$f[1];}
+			if ($ARGV[$no_arg]=~/maxQualThresh=/){@f=split /\=/, $ARGV[$no_arg];$maxQualThresh=$f[1];}
                                 
-		if ($ARGV[$no_arg] eq '-Depth'){$PROC=1}
-                if ($ARGV[$no_arg] eq '-PairCollect'){$PROC=2}
-                if ($ARGV[$no_arg] eq '-PairValid'){$PROC=3}
-                if ($ARGV[$no_arg] eq '-All'){$PROC=-1}
+			if ($ARGV[$no_arg] eq '-Depth'){$PROC=1}
+			if ($ARGV[$no_arg] eq '-PairCollect'){$PROC=2}
+			if ($ARGV[$no_arg] eq '-PairValid'){$PROC=3}
+			if ($ARGV[$no_arg] eq '-All'){$PROC=-1}
 
-                if (!($PROC==0) and (-e $input) and ($output ne '')){$INOUT_valid=1}
+			if (!($PROC==0) and (-e $input) and ($output ne '')){$INOUT_valid=1}
 
-                if (($PROC>0) and (!(-e $input))) {$INOUT_valid=-10;$Error_info="The input file is not exist";}
-		if (($PROC>0) and ($output eq '')) {$INOUT_valid=-11;$Error_info="output file";}
+			if (($PROC>0) and (!(-e $input))) {$INOUT_valid=-10;$Error_info="The input file is not exist";}
+			if (($PROC>0) and ($output eq '')) {$INOUT_valid=-11;$Error_info="output file";}
         }
 
         if ($INOUT_valid<0)
@@ -48,12 +49,14 @@ Usage: ./rdxplorer_pair.pl -Depth/-PairCollect/-PairValid/-All In=[sorted bam fi
 Program: Rdxplorer 2
 Version: 1.0.1
 
-Usage: ./rdxplorer_pair.pl -Depth/-PairCollect/-PairValid/-All In=[sorted bam file] Out=[output_file]
+Usage: ./rdxplorer_pair.pl -Depth/-PairCollect/-PairValid/-All In=[sorted bam file] Out=[output_file] -qualThresh=37 -maxQualThresh=60
 
 Options:
 
 In=File                 Input file, the sorted bam file. (Required)
 Out=File                output file. (Required)
+-qualThresh	k		quality threshhold of k for extracting paired reads
+-maxQualThresh m	maximum quality threshold of m for determining template length distribution
 -Depth			Process the original Rdxplorer
 -PairCollect		Botain paired-end information
 -PairValid		Integrate paired-end information final result

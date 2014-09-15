@@ -27,10 +27,10 @@ sumfolder=/mnt/wigclust17/data/unsafe/kpradhan/projects/kenny/rdexplorer/data3/s
 qthresh=37
 maxqthresh=60
 
-#bam=$1
-#sumfolder=$2
-#qthresh=$3
-#maxqthresh=$4
+bam=$1
+sumfolder=$2
+qthresh=$3
+maxqthresh=$4
 
 echo "bamfile: $bam"
 echo "summary folder: $sumfolder"

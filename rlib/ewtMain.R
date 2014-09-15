@@ -44,8 +44,8 @@ cat(paste("-12", '\n'))
 
     nzd <- baseCopy*gcc/mean(ftd)
 #    cat(paste("-3", '\n'))
-    write.table(round(gcc, 4) ,paste(outputfile,".gcc",sep=""),row.names=F,col.names=F)
-    write.table(round(nzd, 4) ,paste(outputfile,".nzd",sep=""),row.names=F,col.names=F)
+#    write.table(round(gcc, 4) ,paste(outputfile,".gcc",sep=""),row.names=F,col.names=F)
+#    write.table(round(nzd, 4) ,paste(outputfile,".nzd",sep=""),row.names=F,col.names=F)
 #    cat(paste("-2", '\n'))
     out <- ewt(apphome, gcc,gapProbes,degreeInput=0.75)
 #    cat(paste("-1", '\n'))
@@ -67,7 +67,12 @@ cat(paste("-12", '\n'))
 #	cat(paste("8", '\n'))
 	summary <- summary[which(summary$seg.median<=lower | summary$seg.median>=upper),]
 #	cat(paste("9", '\n'))
-	summary <- summary[which(1-pnorm(abs(summary$zstat))<sig),]
+	if (dim(summary)[1] > 0){
+		summary <- summary[which(1-pnorm(abs(summary$zstat))<sig),]
+	}
+	else{
+		summary = data.frame(matrix(rep(0, 10), nrow=1))
+	}
 #	cat(paste("10", '\n'))
 	colnames(summary)<-c("segStart", "segEnd", "state", "length", "copyEst", "segMedian", "zstat", "chrom", "posStart",  "posEnd")
 #	cat(paste("11", '\n'))
@@ -78,7 +83,7 @@ cat(paste("-12", '\n'))
 	  write.table(sum.filt, paste(outputfile,".sum.filt",sep=""), quote = FALSE, sep = "\t", eol = "\n", na = "0", dec = ".", row.names = FALSE, col.names = TRUE, qmethod = c("escape", "double"))
 	}
 
-	write.table(ewtOut,paste(outputfile,".ewt",sep=""), quote = FALSE, sep = "\t", eol = "\n", na = "0", dec = ".", row.names = FALSE, col.names = FALSE, qmethod = c("escape", "double"))
+#	write.table(ewtOut,paste(outputfile,".ewt",sep=""), quote = FALSE, sep = "\t", eol = "\n", na = "0", dec = ".", row.names = FALSE, col.names = FALSE, qmethod = c("escape", "double"))
 #	cat(paste("12", '\n'))
 	#plotit(wrkgdir, countwinfile, chr, filter, dirsep)
 	## No need to load everything second time

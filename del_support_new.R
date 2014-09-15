@@ -28,6 +28,9 @@ chr.v <- paste("chr",1:22,sep="")
 Results <- c()
 for(chr in chr.v){
 pr_file <- paste("dels_",chr,".pr",sep="")
+if (file.info(pr_file)$size <= 0){
+	next
+}
 distances <- read.table(pr_file)
 distances <- distances[,-c(1,2,11,12)]
 events <- del.events.all[del.events.all[,2]==chr,]

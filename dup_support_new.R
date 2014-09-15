@@ -31,6 +31,9 @@ chr.v <- paste("chr",1:22,sep="")
 Result <- c()
 for(chr in chr.v){
 pr_file <- paste("dups_",chr,".pr",sep="") # files of read pairs for each chromosome
+if (file.info(pr_file)$size <= 0){
+	next
+}
 distances <- read.table(pr_file)
 distances <- distances[,-c(1,2,11,12)]
 events <- dup.events.all[dup.events.all[,2]==chr,]
