@@ -32,7 +32,7 @@ if ((($PROC==1) or ($PROC==-1)) and ($INOUT_valid==1))
 {
 	print "$input	$output\n";
 	print "	obtaining information from Bam file...\n";
-	system "samtools view -X -F 0x400 $input | cut -f 1-9 > $output.pos";
+	system "samtools view -X -F 0x400 $input | cut -f 1-5 > $output.pos";
 	print "	Binning...\n";
 	&binning("$output.pos");
 	print "	RDXplorering...\n";

@@ -33,7 +33,10 @@ use warnings;
 #TODO:  It might be faster to go through the bamfile
 #myself instead of using samtools view chr:start-stop
 #if the bam file is indexed it shouldn't be too bad
-
+ 
+#TODO:  sometimes the bam file has references names like
+#chr1, chrX, sometimes just 1, X.
+#need a way to deal with both of them
 
 #command line arguments
 my $eventsFile=$ARGV[0];
@@ -71,11 +74,26 @@ close(EVENTS);
 #print STDERR "all events end\n\n";
 
 
+#find the type of the bamfile
+#type1 if the reads wre mapped to "chrX"
+#type2 if mapped to "X"
+my $type = "";
+my @testReads = `samtools view $bamFile | head -10 | cut -f3`;
+if ($testReads[0] =~ /chr/){
+	$type = "type1";
+}
+else{
+	$type = "type2";
+}
+
 #process the events one by one
 for my $event (@events){
 	#get the event information
 	my ($cnv, $chr, $start, $stop, $rest) = split ' ', $event;
 
+	if ($type eq "type2"){
+		$chr = substr $chr, 3;
+	}
 	#if we need to extend the boundaries(for large deletions)
 	#then we don't need the reads in the middle
 	#just get the stuff around the start and stop of the regions
