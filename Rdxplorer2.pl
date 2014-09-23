@@ -15,8 +15,6 @@ $R_RDXPloprer_package=$cwd;
 
 require "$R_RDXPloprer_package/Binning.pl";
 require "$R_RDXPloprer_package/interface.pl";
-require "$R_RDXPloprer_package/collect_paired_info.pl";
-require "$R_RDXPloprer_package/paired_MQ.pl";
 
 $temp_remove=0;
 print "$R_RDXPloprer_package\n";
