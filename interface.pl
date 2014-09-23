@@ -21,6 +21,8 @@ sub interface
 			if ($ARGV[$no_arg] eq '-PairValid'){$PROC=3}
 			if ($ARGV[$no_arg] eq '-All'){$PROC=-1}
 
+			#TODO:  put in a check for quality thresholds when doing part 2
+
 			if (!($PROC==0) and (-e $input) and ($output ne '')){$INOUT_valid=1}
 
 			if (($PROC>0) and (!(-e $input))) {$INOUT_valid=-10;$Error_info="The input file is not exist";}

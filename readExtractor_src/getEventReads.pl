@@ -28,16 +28,13 @@ use warnings;
 #extension is large enough, it's possible that the reads
 #found from one event might be the same as the reads from the 2nd.
 #if this happens, the reads will not be in sorted order!
+#have to resort after everything's done if this happens
 
 
 #TODO:  It might be faster to go through the bamfile
 #myself instead of using samtools view chr:start-stop
 #if the bam file is indexed it shouldn't be too bad
  
-#TODO:  sometimes the bam file has references names like
-#chr1, chrX, sometimes just 1, X.
-#need a way to deal with both of them
-
 #command line arguments
 my $eventsFile=$ARGV[0];
 my $bamFile=$ARGV[1];
