@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-#given a set of reads return that set, plus, any reads
+#given a set of reads return that set, plus, any reads from the bam file
 #who's coordinates match the coordinates of any pair of the
 #input set
 
