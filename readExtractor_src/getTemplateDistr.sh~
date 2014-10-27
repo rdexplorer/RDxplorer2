@@ -55,13 +55,14 @@ samtools view -X -F 256 tmp_small.sort.bam | $codepath/addColumn.pl >| tmp_small
 
 #3. filter pairs that are mapped to different chromosomes or with inconsistent directions
 
-awk '$8 == "="' tmp_small.sort.txt | $codepath/filterReadPairs.pl 60 >| tmp_distrFilteredReadPairs.txt
+awk '$8 == "="' tmp_small.sort.txt | $codepath/filterReadPairs.pl $maxQual >| tmp_distrFilteredReadPairs.txt
 
 #4.  report insert size
 #	save it to insDistr.txt
 cut -f10 tmp_distrFilteredReadPairs.txt | grep -v -e "-" >| $outFile
-head insDistr.txt 
-tail insDistr.txt 
+
+#head insDistr.txt 
+#tail insDistr.txt 
 
 #make sure there are no 0's
 #this should print a blank line

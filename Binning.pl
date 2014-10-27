@@ -2,6 +2,7 @@
 
 sub binning
 {
+#assume input is already opened
 open(input, $_[0]);
  #print "file: $_[0]\n";
 while(<input>)
