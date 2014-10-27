@@ -47,19 +47,44 @@ while (defined $line1){
 		#both must be mapped to the same chromosome
 		#if ($chr1 ne $chr2) { $isGood = 0; }
 
+		#samtools flag info
+		#p=0x1   paired in sequencing
+		#P=0x2   properly paired
+		#u=0x4   unmapped
+		#U=0x8   mate unmapped
+		#r=0x10  reverse
+		#R=0x20  mate reverse
+		#1=0x40  first read in the pair
+		#2=0x80  second in the pair
+		#s=0x100 secondary alignment
+		#f=0x200 QC failure
+		#d=0x400 duplicates
+		#*       no flag set
+
 		#ignore if both are mapped to the reverse
-		if ($flag1 =~ /rR/) { $isGood = 0; } 
-		if ($flag1 =~ /Rr/) { $isGood = 0; } 
+		#if ($flag1 =~ /rR/) { $isGood = 0; } 
+		#if ($flag1 =~ /Rr/) { $isGood = 0; } 
+		if ($flag1 & hex("0x10") and ($flag2 & hex("0x10") )){
+			$isGood = 0; 
+		}
+
 		#ignore if both are not mapped to the reversed
-		if ((not $flag1 =~ /r/) and (not $flag2 =~ /r/)) { $isGood = 0; }
+		#if ((not $flag1 =~ /r/) and (not $flag2 =~ /r/)) { $isGood = 0; }
+		if (not $flag1 & hex("0x10") and (not $flag2 & hex("0x10") )){
+			$isGood = 0; 
+		}
 
 		#orientation, forward/reverse
-		my $ori1 = ($flag1 =~ /r/ ? "r" : "f");
-		my $ori2 = ($flag2 =~ /r/ ? "r" : "f");		
+		#my $ori1 = ($flag1 =~ /r/ ? "r" : "f");
+		#my $ori2 = ($flag2 =~ /r/ ? "r" : "f");		
+		my $ori1 = ($flag1 & hex("0x10") ? "r" : "f");
+		my $ori2 = ($flag2 & hex("0x10") ? "r" : "f");
 
 		#is it the first or 2nd read
-		my $pair1 = ($flag1 =~ /1/ ? "1" : "2");
-		my $pair2 = ($flag2 =~ /1/ ? "1" : "2");
+		#my $pair1 = ($flag1 =~ /1/ ? "1" : "2");
+		#my $pair2 = ($flag2 =~ /1/ ? "1" : "2");
+		my $pair1 = ($flag1 & hex("0x40") ? "1" : "2");
+		my $pair2 = ($flag2 & hex("0x40") ? "1" : "2");
 
 		if ($isGood){
 			#print the first pair first

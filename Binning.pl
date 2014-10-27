@@ -20,6 +20,7 @@ if ($f[4]>=20)
 	if ($chr ne $chr_last){print "obtaining window counts for Chromosome $chr\n";}
 	$chr_last=$chr;
 }
+
 for ($chrom=1;$chrom<=24;$chrom++)
 {
 	$chr=$chrom;

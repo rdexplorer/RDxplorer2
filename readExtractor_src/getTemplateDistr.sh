@@ -51,7 +51,8 @@ samtools sort -n tmp_small.bam tmp_small.sort
 
 #2. add a column to the sam file so that it fits the requirement of filterReadPairs.pl
  
-samtools view -X -F 256 tmp_small.sort.bam | $codepath/addColumn.pl >| tmp_small.sort.txt
+samtools view -F 256 tmp_small.sort.bam | $codepath/addColumn.pl >| tmp_small.sort.txt
+#samtools view -X -F 256 tmp_small.sort.bam | $codepath/addColumn.pl >| tmp_small.sort.txt
 
 #3. filter pairs that are mapped to different chromosomes or with inconsistent directions
 

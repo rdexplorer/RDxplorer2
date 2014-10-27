@@ -102,7 +102,8 @@ for my $event (@events){
 		my $b = $start + $EVENT_EXTENSION;
 		#print the reads that fall within 
 		#flag 256, get rid of secondary mappings
-		chomp (my @reads1 = `samtools view -F 256 -X -q$qualThresh $bamFile $chr:$a-$b`);
+		#chomp (my @reads1 = `samtools view -F 256 -X -q$qualThresh $bamFile $chr:$a-$b`);
+		chomp (my @reads1 = `samtools view -F 256 -q$qualThresh $bamFile $chr:$a-$b`);
 		for my $r (@reads1){
 			print "$cnv\t$r\n";	
 		}
@@ -110,7 +111,8 @@ for my $event (@events){
 		#end of the event boundary
 		$a = $stop - $EVENT_EXTENSION;
 		$b = $stop + $EVENT_EXTENSION;
-		chomp (my @reads2 = `samtools view -F 256 -X -q$qualThresh $bamFile $chr:$a-$b`);
+		#chomp (my @reads2 = `samtools view -F 256 -X -q$qualThresh $bamFile $chr:$a-$b`);
+		chomp (my @reads2 = `samtools view -F 256 -q$qualThresh $bamFile $chr:$a-$b`);
 		for my $r (@reads2){
 			print "$cnv\t$r\n";	
 		}
@@ -131,7 +133,8 @@ for my $event (@events){
 
 		#find all the reads that fall within event bounds
 		#print STDERR "samtools view -X $bamFile $chr:$start-$stop\n";
-		chomp (my @reads = `samtools view -F 256 -X -q$qualThresh $bamFile $chr:$start-$stop`);
+		#chomp (my @reads = `samtools view -F 256 -X -q$qualThresh $bamFile $chr:$start-$stop`);
+		chomp (my @reads = `samtools view -F 256 -q$qualThresh $bamFile $chr:$start-$stop`);
 		for my $r (@reads){
 			print "$cnv\t$r\n";	
 		}

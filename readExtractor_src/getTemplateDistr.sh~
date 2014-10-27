@@ -61,6 +61,9 @@ awk '$8 == "="' tmp_small.sort.txt | $codepath/filterReadPairs.pl $maxQual >| tm
 #	save it to insDistr.txt
 cut -f10 tmp_distrFilteredReadPairs.txt | grep -v -e "-" >| $outFile
 
+#TODO: do reservoir sampling here if necessary. 
+
+
 #head insDistr.txt 
 #tail insDistr.txt 
 

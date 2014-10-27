@@ -115,7 +115,8 @@ sub getChrPos{
 
 #go through the bam file printing all the reads matching any of the coord
 #TODO:  find flags to get rid of PCR dups and unmapped reads
-open SAM, "samtools view -X -q$qualThresh $bamFile |"; 
+#flag 256 secondary mappings
+open SAM, "samtools view -F 256 -X -q$qualThresh $bamFile |"; 
 my $bamLine = <SAM>; #move pointer to the first line of the sam
 #chr and position of the sam file
 my ($chr2, $pos2) = getChrPos($bamLine);
