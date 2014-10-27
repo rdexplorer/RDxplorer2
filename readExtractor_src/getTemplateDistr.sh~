@@ -13,17 +13,19 @@
 codepath=$(dirname $BASH_SOURCE)
 
 
-bam=A01.bwa.small.bam
-bam=$1
+bam=/Volumes/HD3/CEUTrio/NA12878.mapped.ILLUMINA.bwa.CEU.high_coverage_pcr_free.20130906.bam
+ bam=$1
 nSamps=50000
-nSamps=$2
+ nSamps=$2
 maxQual=60
-maxQual=$3
+ maxQual=$3
 outFile=insDistr.txt
-outFile=$4
+ outFile=$4
 
 #get the total number of mapped reads
-nReads=`samtools idxstats $bam | cut -f3 | paste -sd+ | bc`
+samtools idxstats $bam | cut -f3 > temp0
+nReads=`paste -sd+ temp0| bc`
+rm temp0
 
 #if necessary, create a smaller bam file
 if   [ $nReads -le 200000 ]; then
@@ -31,9 +33,9 @@ if   [ $nReads -le 200000 ]; then
 elif [ $nReads -le 2000000 ]; then
 	samtools view -s 0.1 -hb -q$maxQual -o tmp_small.bam $bam 
 elif [ $nReads -le 20000000 ]; then
-	samtools view -s 0.01 -hb -q$maxQual -o tmp_small.bam $bam
+	samtools view -s 0.01 -hb -q$maxQual -o tmp_small.bam $bam 
 elif [ $nReads -le 200000000 ]; then
-	samtools view -s 0.001 -hb -q$maxQual -o tmp_small.bam $bam
+	samtools view -s 0.001 -hb -q$maxQual -o tmp_small.bam $bam 
 else 
 	samtools view -s 0.0001 -hb -q$maxQual -o tmp_small.bam $bam 
 fi
@@ -43,33 +45,17 @@ fi
 samtools index tmp_small.bam 
 
 
-#1.  get a random sample of reads
-#	start with the bam's header
-samtools view -H tmp_small.bam >| tmp_distrReads.txt
-#	then append a random selection of reads
-#		from those with a mate mapping to same chr
-#		and meet the quality threshold
-samtools view -F 1024 -q$maxQual tmp_small.bam | awk '$7 == "="'| $codepath/reservoirSample.pl $nSamps >> tmp_distrReads.txt
-#need to sort the reads by coordinates 
-#	a. first turn it into a bam
-samtools view -Sb tmp_distrReads.txt >| tmp_distrReads.bam
-#	b. then sort
-samtools sort tmp_distrReads.bam tmp_distrReads_sorted
-#	c. then turn it back to a txt file
-#		#needs human readable bam flags!
-#	while appending a dummy event ID
-samtools view -X tmp_distrReads_sorted.bam | $codepath/addColumn.pl >| tmp_distrReads.txt
+#1. sort by read names
 
-#2.  get search space for those random reads
-$codepath/getSearchSpace.pl tmp_distrReads.txt tmp_small.bam | sort -k 1 | uniq >| tmp_distrNameSortedSubsetSam.txt 
-#
+samtools sort -n tmp_small.bam tmp_small.sort
 
-#3a. the event reads must first be sorted by name
-sort -k 2 tmp_distrReads.txt -o tmp_NameSortedDistrReads.txt
-#3b.  get read pairs
-#	  and filter them
-$codepath/getPairs.pl tmp_NameSortedDistrReads.txt tmp_distrNameSortedSubsetSam.txt | sort -k 1 | $codepath/filterReadPairs.pl $maxQual | sort -k3 -n >| tmp_distrFilteredReadPairs.txt
+#2. add a column to the sam file so that it fits the requirement of filterReadPairs.pl
+ 
+samtools view -X -F 256 tmp_small.sort.bam | $codepath/addColumn.pl >| tmp_small.sort.txt
 
+#3. filter pairs that are mapped to different chromosomes or with inconsistent directions
+
+awk '$8 == "="' tmp_small.sort.txt | $codepath/filterReadPairs.pl 60 >| tmp_distrFilteredReadPairs.txt
 
 #4.  report insert size
 #	save it to insDistr.txt
@@ -79,5 +65,5 @@ tail insDistr.txt
 
 #make sure there are no 0's
 #this should print a blank line
-cat tmp_distrFilteredReadPairs.txt | awk '$10 == 0'
+#cat tmp_distrFilteredReadPairs.txt | awk '$10 == 0'
 
