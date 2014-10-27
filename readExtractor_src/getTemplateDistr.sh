@@ -27,15 +27,15 @@ nReads=`samtools idxstats $bam | cut -f3 | paste -sd+ | bc`
 
 #if necessary, create a smaller bam file
 if   [ $nReads -le 200000 ]; then
-	samtools view -hb -q$maxQual $bam -o tmp_small.bam 
+	samtools view -hb -q$maxQual -o tmp_small.bam $bam 
 elif [ $nReads -le 2000000 ]; then
-	samtools view -s 0.1 -hb -q$maxQual $bam -o tmp_small.bam 
+	samtools view -s 0.1 -hb -q$maxQual -o tmp_small.bam $bam 
 elif [ $nReads -le 20000000 ]; then
-	samtools view -s 0.01 -hb -q$maxQual $bam -o tmp_small.bam 
+	samtools view -s 0.01 -hb -q$maxQual -o tmp_small.bam $bam
 elif [ $nReads -le 200000000 ]; then
-	samtools view -s 0.001 -hb -q$maxQual $bam -o tmp_small.bam 
+	samtools view -s 0.001 -hb -q$maxQual -o tmp_small.bam $bam
 else 
-	samtools view -s 0.0001 -hb -q$maxQual $bam -o tmp_small.bam 
+	samtools view -s 0.0001 -hb -q$maxQual -o tmp_small.bam $bam 
 fi
 
 #create the index for the small bam 
@@ -58,7 +58,7 @@ samtools sort tmp_distrReads.bam tmp_distrReads_sorted
 #	c. then turn it back to a txt file
 #		#needs human readable bam flags!
 #	while appending a dummy event ID
-samtools view -X tmp_distrReads_sorted.bam | sed 's/.*/1\t&/' >| tmp_distrReads.txt
+samtools view -X tmp_distrReads_sorted.bam | $codepath/addColumn.pl >| tmp_distrReads.txt
 
 #2.  get search space for those random reads
 $codepath/getSearchSpace.pl tmp_distrReads.txt tmp_small.bam | sort -k 1 | uniq >| tmp_distrNameSortedSubsetSam.txt 

@@ -51,14 +51,14 @@ Usage: ./rdxplorer_pair.pl -Depth/-PairCollect/-PairValid/-All In=[sorted bam fi
 Program: Rdxplorer 2
 Version: 1.0.1
 
-Usage: ./rdxplorer_pair.pl -Depth/-PairCollect/-PairValid/-All In=[sorted bam file] Out=[output_file] -qualThresh=37 -maxQualThresh=60
+Usage: ./rdxplorer_pair.pl -Depth/-PairCollect/-PairValid/-All In=[sorted bam file] Out=[output_file] qualThresh=37 maxQualThresh=60
 
 Options:
 
 In=File                 Input file, the sorted bam file. (Required)
 Out=File                output file. (Required)
--qualThresh	k		quality threshhold of k for extracting paired reads
--maxQualThresh m	maximum quality threshold of m for determining template length distribution
+qualThresh	k		quality threshhold of k for extracting paired reads
+maxQualThresh m		maximum quality threshold of m for determining template length distribution
 -Depth			Process the original Rdxplorer
 -PairCollect		Botain paired-end information
 -PairValid		Integrate paired-end information final result
