@@ -2,6 +2,7 @@
 #creates two event files for the dels and dups in current dir
 #input is a single file containing at least these columns
 #chrom, posStart, posEnd, state
+#The input event list must have it's events sorted in chromosomal order.
 #result event files have:
 #	event number
 #	chr
@@ -16,79 +17,84 @@ use strict;
 use warnings;
 
 #command line arguments
-my $summaryFolder = $ARGV[0];
-print "summary folder:  $summaryFolder\n";
+my $sumFile = $ARGV[0];
+print "summary file:  $sumFile\n";
 
+#to be filled from the the summary file
+my @events;  
 
-#which summary file goes with which chromosome?
-my %chrSumFileHash;
-for my $sumFile (glob "$summaryFolder/*.sum"){
-	#get the chromosome from summary
-	$sumFile =~ /\.(chr.*)\.rdx_raw/;
-	my $chr = $1;
-	#print STDERR "$chr\t$sumFile\n";
-	$chrSumFileHash{$chr} = $sumFile;
-}
+open my $sfh, "<", $sumFile; 
 
-#the list of chromosomes
-my @chrs = map {"chr" . $_} (1..22,"X","Y");
-#for my $chr (@chrs){
-#	print "$chr\n";
-#}
-
-
-my @events;  #the list of events
-#process the summary files in chromsome order
-for my $chr (@chrs){
-	#which which summary file goes with current chromosome
-	my $sumFile = $chrSumFileHash{$chr};
-	#print STDERR "<$chr>\t<$sumFile>\n";
-
-	open my $sfh, "<", $sumFile; 
-
-	#skip the first line in the summary file
-	<$sfh>;
+	#read first line to find out which columns belong to
+	#	state chrom posStart posEnd
+	my @headers = split ' ', <$sfh>;
+	my ($stateIx, $chromIx, $startIx, $stopIx);
+	for my $i (0 .. $#headers) {
+		print "$i: $headers[$i]\n";
+		if ($headers[$i] eq "state"){
+			$stateIx = $i;
+		}
+		if ($headers[$i] eq "chrom"){
+			$chromIx = $i;
+		}
+		if ($headers[$i] eq "posStart"){
+			$startIx = $i;
+		}
+		if ($headers[$i] eq "posEnd"){
+			$stopIx = $i;
+		}
+	}
 
 	#process summary file line by line
 	while(my $line = <$sfh>){
 		chomp($line);
-		my ($t1, $t2, $state, $t4, $copynum, $t6, $t7, $chrom, $start, $stop, $rest) = split ' ', $line;
-		#print "$t1 $t2 $state $t4 $copynum $t6 $t7 $chrom $start $stop $rest\n";
-		#ignore the lines with copy_num >= 10
-		if ($copynum < 10){
-		
-			#retain  the columns for state, chr, start, stop
-			#add a "chr" to the chr field
-			#print "$state\tchr$chrom\t$start\t$stop\n";
-			push @events, "$state\tchr$chrom\t$start\t$stop\t$line";
+		my @fields = split ' ', $line;
+		my $state = $fields[$stateIx];
+		my $chrom = $fields[$chromIx];
+		#make sure the chrom starts with a "chr"
+		if ($chrom !~ /^chr/){
+			$chrom = "chr".$chrom;
 		}
+		my $start = $fields[$startIx];
+		my $stop = $fields[$stopIx];
+		
+		#retain  the columns for state, chr, start, stop
+		#add a "chr" to the chr field
+		#print "$state\tchr$chrom\t$start\t$stop\n";
+		push @events, "$state\t$chrom\t$start\t$stop\t$line";
 
 	}
 
-	close $sfh;
-}
+close $sfh;
 
 
+#for my $event (@events){
+#	print "$event\n";
+#}
 
-#now that the events are filtered
+#TODO:  make sure events are sorted by chromosomal order
+#
+
+
+#now that the events are read in
 #write them to two separate files for dels and dups
+#include an id for the events as the first column
 open my $delfh, ">", "delEvents.txt";
 open my $dupfh, ">", "dupEvents.txt";
 
-my $enum = 1;
-for my $event (@events){
-	my ($state, $rest) = split ' ', $event, 2;
-	#state 1 are deletions
-	if ($state eq "1"){
-		print $delfh "$enum\t$rest\n";
+	my $enum = 1;
+	for my $event (@events){
+		my ($state, $rest) = split ' ', $event, 2;
+		#state 1 are deletions
+		if ($state eq "del" or $state eq "-" or $state eq "1"){
+			print $delfh "$enum\t$rest\n";
+		}
+		#state 1 are duplications
+		if ($state eq "dup" or $state eq "+" or $state eq "3"){
+			print $dupfh "$enum\t$rest\n";
+		}
+		$enum++;
 	}
-	#state 1 are duplications
-	if ($state eq "3"){
-		print $dupfh "$enum\t$rest\n";
-	}
-	$enum++;
-}
-
 
 close $delfh;
 close $dupfh;

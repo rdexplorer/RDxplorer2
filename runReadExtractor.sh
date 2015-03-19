@@ -1,12 +1,14 @@
 #!/bin/bash
 #collects read pairs from event regions
 #
-#input is a folder containing summary files describing
-#the copy number event.  The .sum files are written in the first
-#part of Rdexplorer
-#
+#input arguments are: 
+#1.  a bam file
+#2.  either a folder containing summary files from the first part of Rdexplorer
+#2.  or a single summary file
+#3.  The quality threshold for read pairs
+#4.  Max quality threshold for getting insert template len distribution
 #output is a list of filtered read pairs from each event
-#  {del,dup}Events.txt:  the list of events from the summary folder
+#  {del,dup}Events.txt:  the list of events from the summary list
 #  {dels,dups}_chr{1..22,X,Y}chr.pr: the paired reads with event id
 #  insDistr.txt:  the distribution of insert template lens taken
 #  				from a sample of high quality reads
@@ -14,33 +16,46 @@
 #  placed in the current directory
 #
 #usage:
-#	./runReadExtractor.sh A01.bwa.bam /data/results/sumfolder 37 60
+#	./runReadExtractor.sh A01.bwa.bam /data/results/sumlocation 37 60
+#       or
+#	./runReadExtractor.sh A01.bwa.bam /data/results/summary.txt 37 60
 
 #get the directory that the code is stored in
 codepath="$(dirname $BASH_SOURCE)/readExtractor_src"
 #codepath="./readExtractor_src"
 
 bam=A01.bwa.small.bam
-#the output from the first part of rdexploer
-sumfolder=/mnt/wigclust17/data/unsafe/kpradhan/projects/kenny/rdexplorer/data3/summaries
-#sumfolder=/data/safe/kpradhan/projects/kenny/rdexplorer/data1/testSummaries/summaries/trunc
+#the output from the first part of rdexplorer
+#or a single summary file with at least 4 columns for state, chrom, posStart, posEnd
+sumlocation=/mnt/wigclust17/data/unsafe/kpradhan/projects/kenny/rdexplorer/data3/summaries
+#sumlocation=/data/safe/kpradhan/projects/kenny/rdexplorer/data1/testSummaries/summaries/trunc
 qthresh=37
 maxqthresh=60
 
 bam=$1
-sumfolder=$2
+sumlocation=$2
 qthresh=$3
 maxqthresh=$4
 
 echo "bamfile: $bam"
-echo "summary folder: $sumfolder"
+echo "summary: $sumlocation"
 echo "quality thresh: $qthresh"
 echo "maxquality thresh: $maxqthresh"
 
-#step 1.  make the event files with entries for
+#step 1.  make the del and dup event files with entries for
 #	cnvID chr start stop
 #assume the events in rdx_raw.sum are already in chromosomal order
-$codepath/getEvents.pl $sumfolder
+if [ -d $sumlocation ]
+then
+    $codepath/getEvents.pl $sumlocation
+elif [ -f $sumlocation ]
+then
+    $codepath/getEventsFromFile.pl $sumlocation
+else
+    echo "Error:  $sumlocation is not a file or folder."
+    exit
+fi
+
 
 
 #get all the reads that are in any of the events
