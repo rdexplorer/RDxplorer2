@@ -31,23 +31,89 @@
         <h1>
 <a id="rdxplorer2" class="anchor" href="#rdxplorer2" aria-hidden="true"><span class="octicon octicon-link"></span></a>RDxplorer2</h1>
 
-<p>write description</p>
+<p>what does the program do?</p>
+
+<p><strong>part1:  Event Finding</strong></p>
+
+<p>descrip1</p>
+
+<p><strong>part2:  Paired Read Extraction</strong></p>
+
+<p>descrip2</p>
+
+<p><strong>part3:  Event Validation</strong></p>
+
+<p>descrip3</p>
 
 <h2>
 <a id="installation" class="anchor" href="#installation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Installation</h2>
 
+<p>RDxplorer2 relies on features available to specific versions of the following software:</p>
+
 <ul>
-<li><p>samtools<br>
-<a href="http://samtools.sourceforge.net/">http://samtools.sourceforge.net/</a></p></li>
-<li><p>perl</p></li>
+<li><p>samtools version: 0.1.19 or higher
+<a href="http://sourceforge.net/projects/samtools/files/samtools/0.1.19/">http://sourceforge.net/projects/samtools/files/samtools/0.1.19/</a></p></li>
+<li><p>perl v5.8.8 or higher</p></li>
+<li><p>R version 2.15.2 or higher</p></li>
 </ul>
+
+<p>Once the prerequisite software is up to date, installation is simple.</p>
+
+<p>Just unzip the archive:</p>
+
+<div class="highlight highlight-bash"><pre>    tar -zxvf rdexplorer-RDxplorer2.tar.gz </pre></div>
+
+<p>And add the root project directory to your path:</p>
+
+<div class="highlight highlight-bash"><pre>    <span class="pl-k">export</span> PATH=<span class="pl-s"><span class="pl-pds">$(</span><span class="pl-c1">pwd</span><span class="pl-pds">)</span></span>/rdexplorer-RDxplorer2:<span class="pl-smi">$PATH</span></pre></div>
 
 <h2>
 <a id="usage" class="anchor" href="#usage" aria-hidden="true"><span class="octicon octicon-link"></span></a>Usage</h2>
 
-<p>examples how to run</p>
+<p>how to run each part separately.</p>
 
-<p>test</p>
+<p><strong>part1:  Event Finding</strong></p>
+
+<p>descrip1</p>
+
+<p><strong>part2:  Paired Read Extraction</strong></p>
+
+<p>There are four input arguments for this script: </p>
+
+<ol>
+<li>a sorted and indexed .bam file( with the .bai located the same directory)</li>
+<li>either 
+
+<ul>
+<li>a summary file containing at least 4 columns for state, chrom, startPos, endPos.</li>
+<li>a folder containing the *.sum output from the first part of the program</li>
+</ul>
+</li>
+<li>a quality score threshold for paired reads</li>
+<li>a max quality score threshold for sampling the insert template length distribution</li>
+</ol>
+
+<div class="highlight highlight-bash"><pre>runReadExtractor.sh input.bam summary.txt 32 60</pre></div>
+
+<p>The output is a new folder named "pairedReads" created in the current directory.<br>
+Inside are "delEvents.txt" and "dupEvents.txt" with the following tab delimited columns:</p>
+
+<ul>
+<li>1  : a unique identifier for the event</li>
+<li>2-4: the 4 columns of interest</li>
+<li>5- : the original summary info.</li>
+</ul>
+
+<p>the 24 paired reads files, "dels_<em>.pr", and "dups_</em>.pr", split by chromosome.
+Each .pr has the reads' info along with a column showing the event they belong to. </p>
+
+<p>The insert template length distribution file, "insDistr.txt".  this is a sampling of the
+template lengths from ~50k high quality read pairs.</p>
+
+<p><strong>part3:  Event Validation</strong></p>
+
+<p>descrip3
+test</p>
 
 <h2>
 <a id="contributors" class="anchor" href="#contributors" aria-hidden="true"><span class="octicon octicon-link"></span></a>Contributors</h2>
