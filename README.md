@@ -5,7 +5,9 @@ test
 prerequisites
 -------------
 
-    1. samtools
+    1. samtools  
+        [download samtools](http://samtools.sourceforge.net/)
+    
     2. perl
     
 usage
