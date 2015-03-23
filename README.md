@@ -1,17 +1,26 @@
 # RDxplorer2
 
-test
+write description
 
-prerequisites
+Installation
 -------------
-
 
 * samtools  
 http://samtools.sourceforge.net/
 
 * perl
     
-usage
+Usage
 -----
+examples how to run
+
 test
+
+
+Contributors
+---------
+
+
+License
+---------
 
