@@ -79,8 +79,12 @@ template lengths from ~50k high quality read pairs.
 
 **part3:  Event Validation**
 
-descrip3
-test
+Make sure you're in the same directory that you were in when you ran the previous step.
+Then run:
+```bash
+  runEventValidator.sh
+```
+It will write the event calls into the pairedReads folder.
 
 
 Contributors
