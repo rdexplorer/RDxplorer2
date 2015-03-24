@@ -50,7 +50,10 @@ for ($chrom=1;$chrom<=24;$chrom++)
 	if ($chrom==22){$end_last=int(51304566/100);}		
 	if ($chrom==23){$end_last=int(155270560/100);}		
 	if ($chrom==24){$end_last=int(59373566/100);}		
-	
+
+	if ($output eq ""){
+		$output = "rdxp";
+	}
 	open(output, ">$output.chr$chr.window100.count");
 	
 	for ($i=1;$i<=$end_last;$i++)
