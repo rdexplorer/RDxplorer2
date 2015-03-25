@@ -1,46 +1,56 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
   <head>
-    <meta charset='utf-8'>
+    <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
-
-    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
-    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen">
-    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print">
-
     <title>Rdxplorer2 by rdexplorer</title>
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script src="javascripts/respond.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <!--[if lt IE 8]>
+    <link rel="stylesheet" href="stylesheets/ie.css">
+    <![endif]-->
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
   </head>
-
   <body>
+      <div id="header">
+        <nav>
+          <li class="fork"><a href="https://github.com/rdexplorer/RDxplorer2">View On GitHub</a></li>
+          <li class="downloads"><a href="https://github.com/rdexplorer/RDxplorer2/zipball/master">ZIP</a></li>
+          <li class="downloads"><a href="https://github.com/rdexplorer/RDxplorer2/tarball/master">TAR</a></li>
+          <li class="title">DOWNLOADS</li>
+        </nav>
+      </div><!-- end header -->
 
-    <header>
-      <div class="container">
-        <h1>Rdxplorer2</h1>
-        <h2>Copy Number Analysis</h2>
+    <div class="wrapper">
 
-        <section id="downloads">
-          <a href="https://github.com/rdexplorer/RDxplorer2/zipball/master" class="btn">Download as .zip</a>
-          <a href="https://github.com/rdexplorer/RDxplorer2/tarball/master" class="btn">Download as .tar.gz</a>
-          <a href="https://github.com/rdexplorer/RDxplorer2" class="btn btn-github"><span class="icon"></span>View on GitHub</a>
-        </section>
-      </div>
-    </header>
+      <section>
+        <div id="title">
+          <h1>Rdxplorer2</h1>
+          <p>Copy Number Analysis</p>
+          <hr>
+          <span class="credits left">Project maintained by <a href="https://github.com/rdexplorer">rdexplorer</a></span>
+          <span class="credits right">Hosted on GitHub Pages &mdash; Theme by <a href="https://twitter.com/michigangraham">mattgraham</a></span>
+        </div>
 
-    <div class="container">
-      <section id="main_content">
         <h1>
 <a id="rdxplorer2" class="anchor" href="#rdxplorer2" aria-hidden="true"><span class="octicon octicon-link"></span></a>RDxplorer2</h1>
 
 <p>todo:  goal of prog?</p>
 
-<p><strong>Event Finding</strong>
+<p><strong>Event Finding:</strong>
 Finds the region boundaries of possible copy number events.</p>
 
-<p><strong>Paired Read Extraction</strong>
+<p><strong>Paired Read Extraction:</strong>
 Finds the read pairs that have at least one mate 
 close to the events found in the previous step.  </p>
 
-<p><strong>Event Validation</strong>
+<p><strong>Event Validation:</strong>
 Assigns probabilities to events based on their read pair info.</p>
 
 <h2>
@@ -71,11 +81,19 @@ program scripts when running from the command line.</p>
 <h2>
 <a id="usage" class="anchor" href="#usage" aria-hidden="true"><span class="octicon octicon-link"></span></a>Usage</h2>
 
-<p>How to run each part separately.</p>
+<p>This version of the software allows you to run each part separately.</p>
 
 <p><strong>Event Finding</strong></p>
 
-<p>descrip1</p>
+<p>This perl script takes the location of the bam file as its single command line argument.
+The file is assumed to be sorted by position and indexed, with its .bai 
+located in the same directory as the .bam.</p>
+
+<p>To run the script:</p>
+
+<div class="highlight highlight-bash"><pre>runEventFinder.pl input.bam</pre></div>
+
+<p>It outputs one summary file(rdxp.chr*.rdx_raw.sum) for each chromosome where events are found.</p>
 
 <p><strong>Paired Read Extraction</strong></p>
 
@@ -86,7 +104,8 @@ program scripts when running from the command line.</p>
 <li>one of the following 
 
 <ul>
-<li>a summary file containing at least 4 columns for state, chrom, startPos, endPos.</li>
+<li>a summary file containing at least 4 columns for state, chrom, startPos, endPos, 
+with events sorted in chromosomal order.</li>
 <li>a folder containing the *.sum output files from the first part of the program</li>
 </ul>
 </li>
@@ -95,7 +114,7 @@ program scripts when running from the command line.</p>
 Reads lower than the threshold will be ignored</li>
 </ol>
 
-<p>Run the script.</p>
+<p>To run the script:</p>
 
 <ul>
 <li>If you have a list of precomputed events:</li>
@@ -104,32 +123,39 @@ Reads lower than the threshold will be ignored</li>
 <div class="highlight highlight-bash"><pre>runReadExtractor.sh input.bam summary.txt 32 60</pre></div>
 
 <ul>
-<li>If you have a folder containing the .sum files generated from the previous step:</li>
+<li>If you have a preexisting folder containing the .sum files generated from <strong>event finding</strong>:</li>
 </ul>
 
 <div class="highlight highlight-bash"><pre>runReadExtractor.sh input.bam resultFolder 32 60</pre></div>
 
-<p>The output will be a new folder named "pairedReads" created in the directory the script was run from.  </p>
+<ul>
+<li>If you have just run <strong>event finding</strong> and are still in the same directory:</li>
+</ul>
+
+<div class="highlight highlight-bash"><pre>runReadExtractor.sh input.bam <span class="pl-c1">.</span> 32 60</pre></div>
+
+<p>The output will be a newly created folder called "pairedReads" placed in the current directory.  </p>
 
 <p>Inside are "delEvents.txt" and "dupEvents.txt" with tab delimited columns:</p>
 
 <ul>
-<li>1  : a unique identifier for the event</li>
-<li>2-4: the 4 columns of interest.</li>
-<li>5- : the original summary info.</li>
+<li>cols 1  : a unique identifier for the event</li>
+<li>cols 2-4: the 4 columns of interest.</li>
+<li>cols 5- : the original summary info.</li>
 </ul>
 
-<p>The 24 paired reads files, "dels_*.pr", and "dups_*.pr", split by chromosome.
-Each .pr has the reads' info along with a column showing the event they belong to. </p>
+<p>There are 24 paired reads files, "dels_*.pr", and "dups_*.pr", split by chromosome.
+Each .pr has the reads' mapping info along with a column showing the event they are from. </p>
 
-<p>The insert template length distribution file, "insDistr.txt".<br>
+<p>There is an insert template length distribution file, "insDistr.txt".<br>
 This is a sampling of ~50k template lengths from high quality read pairs.</p>
 
 <p><strong>Event Validation</strong></p>
 
-<p>The program assumes there is a properly constructed pairedReads folder in the current directory.</p>
+<p>The program assumes there is a properly constructed "pairedReads" folder in the current directory.
+If you have run the previous command, the folder will be loaded with all the necessary files.</p>
 
-<p>Run the script:</p>
+<p>To run the script:</p>
 
 <div class="highlight highlight-bash"><pre>  runEventValidator.sh</pre></div>
 
@@ -152,8 +178,9 @@ This is a sampling of ~50k template lengths from high quality read pairs.</p>
 <h2>
 <a id="license" class="anchor" href="#license" aria-hidden="true"><span class="octicon octicon-link"></span></a>License</h2>
       </section>
-    </div>
 
+    </div>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
     
   </body>
 </html>
