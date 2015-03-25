@@ -2,14 +2,14 @@
 
 todo:  goal of prog?
 
-**Event Finding**
+**Event Finding:**
 Finds the region boundaries of possible copy number events.
 
-**Paired Read Extraction**
+**Paired Read Extraction:**
 Finds the read pairs that have at least one mate 
 close to the events found in the previous step.  
 
-**Event Validation**
+**Event Validation:**
 Assigns probabilities to events based on their read pair info.
 
 
@@ -44,12 +44,22 @@ program scripts when running from the command line.
 
 Usage
 -----
-How to run each part separately.
+This version of the software allows you to run each part separately.
 
 
 **Event Finding**
 
-descrip1
+This perl script takes the location of the bam file as its single command line argument.
+The file is assumed to be sorted by position and indexed, with its .bai 
+located in the same directory as the .bam.
+
+To run the script:
+```bash
+runEventFinder.pl input.bam
+```
+
+It outputs one summary file(rdxp.chr\*\.rdx_raw.sum) for each chromosome where events are found.
+
 
 **Paired Read Extraction**
 
@@ -57,42 +67,49 @@ There are four input arguments for this script:
 
 1. a sorted and indexed .bam file(with the .bai located the same directory)
 2. one of the following 
-  * a summary file containing at least 4 columns for state, chrom, startPos, endPos.
+  * a summary file containing at least 4 columns for state, chrom, startPos, endPos, 
+  with events sorted in chromosomal order.
   * a folder containing the *.sum output files from the first part of the program
 3. a quality score threshold for paired reads.  Reads lower than the threshold this will be ignored.
 4. a quality score threshold for sampling the insert template length distribution.  
 Reads lower than the threshold will be ignored
 
-Run the script.
+To run the script:
 * If you have a list of precomputed events:
 ```bash
 runReadExtractor.sh input.bam summary.txt 32 60
 ```
 
-* If you have a folder containing the .sum files generated from the previous step:
+* If you have a preexisting folder containing the .sum files generated from **event finding**:
 ```bash
 runReadExtractor.sh input.bam resultFolder 32 60
 ```
 
-The output will be a new folder named "pairedReads" created in the directory the script was run from.  
+* If you have just run **event finding** and are still in the same directory:
+```bash
+runReadExtractor.sh input.bam . 32 60
+```
+
+The output will be a newly created folder called "pairedReads" placed in the current directory.  
 
 Inside are "delEvents.txt" and "dupEvents.txt" with tab delimited columns:
-* 1  : a unique identifier for the event
-* 2-4: the 4 columns of interest.
-* 5- : the original summary info.
+* cols 1  : a unique identifier for the event
+* cols 2-4: the 4 columns of interest.
+* cols 5- : the original summary info.
 
-The 24 paired reads files, "dels\_\*.pr", and "dups\_\*.pr", split by chromosome.
-Each .pr has the reads' info along with a column showing the event they belong to. 
+There are 24 paired reads files, "dels\_\*.pr", and "dups\_\*.pr", split by chromosome.
+Each .pr has the reads' mapping info along with a column showing the event they are from. 
 
-The insert template length distribution file, "insDistr.txt".  
+There is an insert template length distribution file, "insDistr.txt".  
 This is a sampling of ~50k template lengths from high quality read pairs.
 
 
 **Event Validation**
 
-The program assumes there is a properly constructed pairedReads folder in the current directory.
+The program assumes there is a properly constructed "pairedReads" folder in the current directory.
+If you have run the previous command, the folder will be loaded with all the necessary files.
 
-Run the script:
+To run the script:
 ```bash
   runEventValidator.sh
 ```
