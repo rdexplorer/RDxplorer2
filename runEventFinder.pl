@@ -34,3 +34,6 @@ print "	RDXploring...\n";
 #print ("Rscript $codepath/RBatch.R $codepath ./rdxp");
 system "Rscript $codepath/RBatch.R $codepath ./rdxp";
 
+#delete the count files when finished.
+system ("rm rdxp*count")
+
