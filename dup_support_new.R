@@ -26,7 +26,10 @@ references <- references[references[,1]< 5*median(references[,1]),1] #remove out
 dist.ref <- quantile(abs(references),1-10/5000) 
 
 # work chromosome by chromosome
-chr.v <- paste("chr",1:22,sep="")
+# chr.v <- paste("chr",1:22,sep="")
+
+chr.v <- paste("chr",c(1:22,"X","Y"),sep="")
+
 
 Result <- c()
 for(chr in chr.v){

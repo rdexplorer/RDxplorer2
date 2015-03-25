@@ -23,7 +23,9 @@ references <-read.csv(ref_file,header=F)
 
 references <- references[references[,1]< 5*median(references[,1]),1] 
 
-chr.v <- paste("chr",1:22,sep="")
+# chr.v <- paste("chr",1:22,sep="")
+
+chr.v <- paste("chr",c(1:22,"X","Y"),sep="")
 
 Results <- c()
 for(chr in chr.v){
