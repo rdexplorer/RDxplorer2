@@ -104,7 +104,7 @@ for(i in 1:length(events[,1])){
       pass <- (readcount.off.max > 5 & (readcount.off.max/readcount.off.total > 0.5)) | dup.neg> 5 |dup.g1000 > 5
 
 	dup.pass[pass] <- "PASS"
-
+## make change, exclude column 7:10 in results
 	Result<-rbind(Result,cbind(events[,c(1:4,7:10)],dup.neg,dup.g1000,readcount.off.max,readcount.off.total,dup.off.chr,dup.pass));
 }
 
